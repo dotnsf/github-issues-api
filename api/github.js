@@ -59,9 +59,12 @@ api.getIssues = async function( user, repo, params_obj, token ){
 };
 
 //. Comments
-api.getComments = async function( user, repo, params_obj, token ){
+api.getComments = async function( user, repo, issue_num, params_obj, token ){
   return new Promise( async function( resolve, reject ){
-    var url = 'https://api.github.com/repos/' + user + '/' + repo + '/issues/comments';
+    var url = issue_num ? 
+      'https://api.github.com/repos/' + user + '/' + repo + '/issues/' + issue_num + '/comments' :
+      'https://api.github.com/repos/' + user + '/' + repo + '/issues/comments';
+
     if( params_obj && typeof params_obj == 'object' ){
       var params = [];
       Object.keys( params_obj ).forEach( function( key ){
@@ -122,8 +125,9 @@ api.get( '/comments/:user/:repo', async function( req, res ){
   var user = req.params.user;
   var repo = req.params.repo;
   if( user && repo ){
+    var issue_num = req.query.issue_num;
     var token = req.query.token;
-    api.getComments( user, repo, null, token ).then( function( result ){
+    api.getComments( user, repo, issue_num, null, token ).then( function( result ){
       res.status( result.status ? 200 : 400 );
       res.write( JSON.stringify( result, null, 2 ) );
       res.end();

@@ -40,10 +40,11 @@ function getComments(){
   var user = $('#github_user').val();
   var repo = $('#github_repo').val();
   if( user && repo ){
+    var issue_num = $('#github_issue_num').val();
     var token = $('#github_token').val();
     $.ajax({
       type: 'GET',
-      url: API_SERVER + '/api/github/comments/' + user + '/' + repo + '?token=' + token,
+      url: API_SERVER + '/api/github/comments/' + user + '/' + repo + '?token=' + token + '&issue_num=' + issue_num,
       success: function( result ){
         $('#debug').css( 'color', '#080' );
         $('#debug').html( JSON.stringify( result.comments, null, 2 ) );
