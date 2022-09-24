@@ -1,5 +1,7 @@
 //. github.js
 
+const { Router } = require('express');
+
 var express = require( 'express' ),
     bodyParser = require( 'body-parser' ),
     request = require( 'request' ),

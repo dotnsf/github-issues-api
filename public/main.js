@@ -56,3 +56,13 @@ function getComments(){
   }
 }
 
+function myLogin(){
+  location.href = '/login';
+}
+
+function myLogout(){
+  if( confirm( "ログアウトしますか？" ) ){
+    location.href = '/logout';
+  }
+}
+
