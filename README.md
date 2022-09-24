@@ -9,7 +9,9 @@
 
 - Input App name, Homepage URL(`http://localhost:8080` for example), Callback URL(`http://localhost:8080/callback` for example), and click **Create OAuth App** button. 
 
-- Copy `client_id`, (generated)`client_secret`, and `callback_url`, then specify them as environment values of CLIENT_ID, CLIENT_SECRET, and CALLBACK_URL when execute application.
+- Copy `client_id`, (generated)`client_secret`, and `callback_url`, then specify them as environment values of `CLIENT_ID`, `CLIENT_SECRET`, and `CALLBACK_URL` when execute application.
+
+- You can also specify environment values of `CORS` which indicate available from origin to execute APIs from outside of application server.
 
 
 ## APIs
