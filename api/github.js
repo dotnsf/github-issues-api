@@ -109,7 +109,16 @@ api.get( '/issues/:user/:repo', async function( req, res ){
   var repo = req.params.repo;
   if( user && repo ){
     var token = req.query.token;
-    api.getIssues( user, repo, null, token ).then( function( result ){
+
+    //. #2
+    var params_obj = {};
+    Object.keys( req.query ).forEach( function( key ){
+      if( [ 'filter', 'state', 'labels' ].indexOf( key ) > -1 ){
+        params_obj[key] = req.query[key];
+      }
+    });
+
+    api.getIssues( user, repo, params_obj, token ).then( function( result ){
       res.status( result.status ? 200 : 400 );
       res.write( JSON.stringify( result, null, 2 ) );
       res.end();
