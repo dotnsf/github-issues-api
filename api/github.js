@@ -54,7 +54,7 @@ api.getIssues = async function( user, repo, params_obj, token ){
           body = JSON.parse( body );
         }
         //console.log( { body } );
-        resolve( { status: true, params: params_obj, issues: body } );
+        resolve( { status: true, params: params_obj, res_headers: res.headers, issues: body } );
       }
     });
   });
@@ -95,7 +95,7 @@ api.getComments = async function( user, repo, issue_num, params_obj, token ){
           body = JSON.parse( body );
         }
         //console.log( { body } );
-        resolve( { status: true, params: params_obj, comments: body } );
+        resolve( { status: true, params: params_obj, res_headers: res.headers, comments: body } );
       }
     });
   });
@@ -121,21 +121,23 @@ api.get( '/issues/:user/:repo', async function( req, res ){
     var issues = [];
     var page = 1;
     var b = true;
+    var result = null;
+
     while( b ){
       params_obj['page'] = page;
-      var result = await api.getIssues( user, repo, params_obj, token );
+      result = await api.getIssues( user, repo, params_obj, token );
       if( result.status && result.issues && result.issues.length > 0 ){
         issues = issues.concat( result.issues );
       }
 
-      if( result.issues.length < PER_PAGE ){
+      if( !result.issues || result.issues.length < PER_PAGE ){
         b = false;
       }else{
         page ++;
       }
     }
 
-    res.write( JSON.stringify( { status: true, issues: issues, api_call: page }, null, 2 ) );
+    res.write( JSON.stringify( { status: true, headers: result.res_headers, issues: issues, api_call: page }, null, 2 ) );
     res.end();
   }else{
     res.status( 400 );
@@ -165,21 +167,22 @@ api.get( '/comments/:user/:repo', async function( req, res ){
     var comments = [];
     var page = 1;
     var b = true;
+    var result = null;
     while( b ){
       params_obj['page'] = page;
-      var result = await api.getComments( user, repo, issue_num, params_obj, token );
+      result = await api.getComments( user, repo, issue_num, params_obj, token );
       if( result.status && result.comments && result.comments.length > 0 ){
         comments = comments.concat( result.comments );
       }
 
-      if( result.comments.length < PER_PAGE ){
+      if( !result.comments || result.comments.length < PER_PAGE ){
         b = false;
       }else{
         page ++;
       }
     }
 
-    res.write( JSON.stringify( { status: true, comments: comments, api_call: page }, null, 2 ) );
+    res.write( JSON.stringify( { status: true, headers: result.res_headers, comments: comments, api_call: page }, null, 2 ) );
     res.end();
   }else{
     res.status( 400 );
