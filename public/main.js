@@ -139,6 +139,9 @@ function getMilestones(){
 function showRateLimitReset( result ){
   if( result && result.headers && result.headers['x-ratelimit-reset'] ){
     var remain = result.headers['x-ratelimit-remaining'];
+    var limit = result.headers['x-ratelimit-limit'];
+    var remaining = remain + '/' + limit;
+    
     var reset = result.headers['x-ratelimit-reset'];
     if( typeof reset == 'string' ){ reset = parseInt( reset ); }
     reset *= 1000;
@@ -157,7 +160,9 @@ function showRateLimitReset( result ){
       + ' ' + ( h < 10 ? '0' : '' ) + h
       + ':' + ( n < 10 ? '0' : '' ) + n
       + ':' + ( s < 10 ? '0' : '' ) + s;
-    console.log( 'next reset : ' + ymdhns + ' remain(' + remain + ')' );
+
+    $('#ratelimit-remaining').html( remaining );
+    $('#ratelimit-reset').html( ymdhns );
   }
 }
 
