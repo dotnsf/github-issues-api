@@ -64,8 +64,11 @@ var API_SERVER = '<%= API_SERVER %>';
       </tr>
       <tr>
         <td colspan="2">
-          <button class="btn btn-primary" onClick="getIssues();">Issues</button>
-          <button class="btn btn-success" onClick="getComments();">Comments</button>
+          <button id="mybtn-issues" class="mybtn btn btn-primary" onClick="getIssues();">Issues</button>
+          <button id="mybtn-comments" class="mybtn btn btn-success" onClick="getComments();" disabled>Comments</button>
+          <button id="mybtn-assignees" class="mybtn btn btn-info" onClick="getAssignees();">Assignees</button>
+          <button id="mybtn-labels" class="mybtn btn btn-warning" onClick="getLabels();">Labels</button>
+          <button id="mybtn-milestones" class="mybtn btn btn-danger" onClick="getMilestones();">Milestones</button>
         </td>
       </tr>
     </tbody>
