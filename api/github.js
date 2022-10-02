@@ -1,5 +1,5 @@
 //. github.js
-
+const PER_PAGE = 100;
 const { Router } = require('express');
 
 var express = require( 'express' ),
@@ -111,18 +111,32 @@ api.get( '/issues/:user/:repo', async function( req, res ){
     var token = req.query.token;
 
     //. #2
-    var params_obj = {};
+    var params_obj = { state: 'all', per_page: PER_PAGE };
     Object.keys( req.query ).forEach( function( key ){
       if( [ 'filter', 'state', 'labels' ].indexOf( key ) > -1 ){
         params_obj[key] = req.query[key];
       }
     });
 
-    api.getIssues( user, repo, params_obj, token ).then( function( result ){
-      res.status( result.status ? 200 : 400 );
-      res.write( JSON.stringify( result, null, 2 ) );
-      res.end();
-    });
+    var issues = [];
+    var page = 1;
+    var b = true;
+    while( b ){
+      params_obj['page'] = page;
+      var result = await api.getIssues( user, repo, params_obj, token );
+      if( result.status && result.issues && result.issues.length > 0 ){
+        issues = issues.concat( result.issues );
+      }
+
+      if( result.issues.length < PER_PAGE ){
+        b = false;
+      }else{
+        page ++;
+      }
+    }
+
+    res.write( JSON.stringify( { status: true, issues: issues, api_call: page }, null, 2 ) );
+    res.end();
   }else{
     res.status( 400 );
     res.write( JSON.stringify( { status: false, error: 'parameter user & repo are mandatory.' }, null, 2 ) );
@@ -138,11 +152,35 @@ api.get( '/comments/:user/:repo', async function( req, res ){
   if( user && repo ){
     var issue_num = req.query.issue_num;
     var token = req.query.token;
-    api.getComments( user, repo, issue_num, null, token ).then( function( result ){
-      res.status( result.status ? 200 : 400 );
-      res.write( JSON.stringify( result, null, 2 ) );
-      res.end();
+
+    var params_obj = { per_page: PER_PAGE };
+    Object.keys( req.query ).forEach( function( key ){
+      /*
+      if( [ 'filter', 'state', 'labels' ].indexOf( key ) > -1 ){
+        params_obj[key] = req.query[key];
+      }
+      */
     });
+
+    var comments = [];
+    var page = 1;
+    var b = true;
+    while( b ){
+      params_obj['page'] = page;
+      var result = await api.getComments( user, repo, issue_num, params_obj, token );
+      if( result.status && result.comments && result.comments.length > 0 ){
+        comments = comments.concat( result.comments );
+      }
+
+      if( result.comments.length < PER_PAGE ){
+        b = false;
+      }else{
+        page ++;
+      }
+    }
+
+    res.write( JSON.stringify( { status: true, comments: comments, api_call: page }, null, 2 ) );
+    res.end();
   }else{
     res.status( 400 );
     res.write( JSON.stringify( { status: false, error: 'parameter user & repo are mandatory.' }, null, 2 ) );

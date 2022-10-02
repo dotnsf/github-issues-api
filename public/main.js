@@ -25,6 +25,7 @@ function getIssues(){
       type: 'GET',
       url: API_SERVER + '/api/github/issues/' + user + '/' + repo + '?token=' + token,
       success: function( result ){
+        console.log( result );
         $('#debug').css( 'color', '#008' );
         $('#debug').html( JSON.stringify( result.issues, null, 2 ) );
       },
@@ -46,6 +47,7 @@ function getComments(){
       type: 'GET',
       url: API_SERVER + '/api/github/comments/' + user + '/' + repo + '?token=' + token + '&issue_num=' + issue_num,
       success: function( result ){
+        console.log( result );
         $('#debug').css( 'color', '#080' );
         $('#debug').html( JSON.stringify( result.comments, null, 2 ) );
       },
