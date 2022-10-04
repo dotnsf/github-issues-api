@@ -1,42 +1,67 @@
 //. cms.js
 $( async function(){
-  var numbers = [];
   var result0 = await getIssues();
-  if( result0 && result0.status && result0.issues && result0.issues.length > 0 ){
-    var ul0 = '<ul>';
-    for( var i = 0; i < result0.issues.length; i ++ ){
-      var num = result0.issues[i].number;
-      var comments = result0.issues[i].comments;
-      var li0 = '<li id="li0_' + num + '"><div>' 
-        + result0.issues[i].title
-        + '<br/>'
-        + ( result0.issues[i].body ? marked.parse( result0.issues[i].body ) : '' )  //. 要マークダウンデコード
-        + '</div></li>';
-      ul0 += li0;
+  if( result0 && result0.status && result0.issues ){
+    if( result0.issues.message ){
+      $('#cms_head').html( '' );
+      $('#cms_main').html( '' );
 
-      if( comments > 0 ){
-        numbers.push( num );
+      if( result0.issues.message ){
+        $('#my_toast-body').html( result0.issues.message );
+        $('#my_toast').toast( { delay: 1000 } );
+        $('#my_toast').toast( 'show' );
+      }
+    }else if( result0.issues.length > 0 ){
+      var numbers = [];
+      var heads = '';
+      var mains = '';
+      var foots = '';
+      //. 並びは番号順でいい？
+      for( var i = result0.issues.length - 1; i >= 0; i -- ){
+        var num = result0.issues[i].number;
+        var comments = result0.issues[i].comments;
+        var title = result0.issues[i].title;
+        var body = ( result0.issues[i].body ? marked.parse( result0.issues[i].body ) : '' );
+  
+        var head = '&nbsp;<a href="#main_' + num + '">' + title + '(' + comments + ')' + '</a>'
+        var main = '<div style="margin-top: 50px;">'
+          + '<a name="main_' + num + '"/>'
+          + '<div id="card_' + num + '" class="card">'
+          + '<div class="card-body">'
+          + '<h5 class="card-title">' + title + '</h5>'
+          + '<p class="card-text"><pre>' + body + '</pre></p>'
+          + '</div>'
+          + '<ul id="ul_' + num + '" class="list-group list-group-flush">'
+          + '</ul>'
+          + '<a class="btn btn-primary" target="_blank" href="https://github.com/' + GITHUB_REPO + '/issues/' + num + '">コメント</a>'
+          + '</div>'
+          + '</div>';
+      
+        heads += head;
+        mains += main;
+
+        if( comments > 0 ){
+          numbers.push( num );
+        }
+      }
+
+      $('#cms_head').html( heads );
+      $('#cms_main').html( mains );
+
+      for( var i = 0; i < numbers.length; i ++ ){
+        var num = numbers[i];
+        var result1 = await getComments( num );
+        if( result1 && result1.status && result1.comments && result1.comments.length > 0 ){
+          for( var j = 0; j < result1.comments.length; j ++ ){
+            var li1 = '<li class="list-group-item" id="li1_' + num + '_' + j + '"><pre>' 
+              + ( result1.comments[j].body ? marked.parse( result1.comments[j].body ) : '' )
+              + '</pre></li>';
+            $('#ul_' + num).append( li1 );
+          }
+        }
       }
     }
-    ul0 += '</ul>';
-    $('#cms_main').html( ul0 );
-    //console.log( {ul0} );
-  }
-
-  for( var i = 0; i < numbers.length; i ++ ){
-    var result1 = await getComments( numbers[i] );
-    if( result1 && result1.status && result1.comments && result1.comments.length > 0 ){
-      var ul1 = '<ul>';
-      for( var j = 0; j < result1.comments.length; j ++ ){
-        var li1 = '<li id="li1_' + numbers[i] + '_' + j + '"><div>' 
-          + ( result1.comments[j].body ? marked.parse( result1.comments[j].body ) : '' )  //. 要マークダウンデコード
-          + '</div></li>';
-        ul1 += li1;
-      }
-      ul1 += '</ul>';
-      //console.log( numbers[i], {ul1} );
-      $('#li0_' + numbers[i]).append( ul1 );
-    }
+  }else{
   }
 });
 
@@ -52,7 +77,9 @@ async function getIssues(){
       },
       error: function( e0, e1, e2 ){
         console.log( e0, e1, e2 );
-        reject( e0 );
+
+        //reject( e0 );
+        resolve( { status: false, error: e0, message: JSON.stringify( e0 ) } );
       }
     });
   });
@@ -70,7 +97,8 @@ async function getComments( issue_num ){
       },
       error: function( e0, e1, e2 ){
         console.log( e0, e1, e2 );
-        reject( e0 );
+        //reject( e0 );
+        resolve( { status: false, error: e0, message: JSON.stringify( e0 ) } );
       }
     });
   });
@@ -103,6 +131,9 @@ function showRateLimitReset( result ){
 
     $('#ratelimit-remaining').html( remaining );
     $('#ratelimit-reset').html( ymdhns );
+  }else{
+    $('#ratelimit-remaining').html( '--' );
+    $('#ratelimit-reset').html( '--' );
   }
 }
 

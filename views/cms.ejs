@@ -46,7 +46,11 @@ var TOKEN = '<%= user ? user.token : "" %>';
 </nav>
 
 <div class="container" style="margin-top: 50px;">
+  <div id="cms_head">
+  </div>
   <div id="cms_main">
+  </div>
+  <div id="cms_foot">
   </div>
 </div>
 
@@ -59,6 +63,12 @@ var TOKEN = '<%= user ? user.token : "" %>';
   <pre id="debug">
 
   </pre>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="my_toast" role="alert" aria-live="assertive" aria-atomic="true">
+  <div id="my_toast-body" class="toast-body" style="font-size: 14px;">
+  </div>
 </div>
 
 </body>
