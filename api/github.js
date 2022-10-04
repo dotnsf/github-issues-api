@@ -228,7 +228,8 @@ api.get( '/issues/:user/:repo', async function( req, res ){
     var params_obj = { state: 'all', per_page: PER_PAGE };
     Object.keys( req.query ).forEach( function( key ){
       if( [ 'filter', 'state', 'labels' ].indexOf( key ) > -1 ){
-        params_obj[key] = req.query[key];
+        //. labels=AAA,BBB は AAA && BBB
+        params_obj[key] = encodeURI( req.query[key] );
       }
     });
 

@@ -22,17 +22,41 @@ $( async function(){
         var comments = result0.issues[i].comments;
         var title = result0.issues[i].title;
         var body = ( result0.issues[i].body ? marked.parse( result0.issues[i].body ) : '' );
+
+        var labels = "";
+        if( result0.issues[i].labels && result0.issues[i].labels.length > 0 ){
+          for( var j = 0; j < result0.issues[i].labels.length; j ++ ){
+            var label = '&nbsp;<span style="background: ' + result0.issues[i].labels[j].color + '">' + result0.issues[i].labels[j].name + '</span>';
+            labels += label;
+          }
+        }
+
+        var assignee = "";
+        if( result0.issues[i].assignee ){
+          assignee = '<img src="' + result0.issues[i].assignee.avatar_url + '" width="50"/>'
+            + '<a target="_blank" href="' + result0.issues[i].assignee.html_url + '">' + result0.issues[i].assignee.login + '</a>';
+        }
+
+        var milestone = "";
+        if( result0.issues[i].milestone ){
+          milestone = result0.issues[i].milestone.title;
+        }
   
         var head = '&nbsp;<a href="#main_' + num + '">' + title + '(' + comments + ')' + '</a>'
         var main = '<div style="margin-top: 50px;">'
           + '<a name="main_' + num + '"/>'
           + '<div id="card_' + num + '" class="card">'
+          + '<div class="card-header">'
+          + labels
+          + '</div>'
           + '<div class="card-body">'
           + '<h5 class="card-title">' + title + '</h5>'
+          + '<h6 class="card-subtitle mb-2 text-muted">' + assignee + '</h6>'
           + '<p class="card-text"><pre>' + body + '</pre></p>'
           + '</div>'
           + '<ul id="ul_' + num + '" class="list-group list-group-flush">'
           + '</ul>'
+          + '<a href="#" class="card-link">' + milestone + '</a>'
           + '<a class="btn btn-primary" target="_blank" href="https://github.com/' + GITHUB_REPO + '/issues/' + num + '">コメント</a>'
           + '</div>'
           + '</div>';
