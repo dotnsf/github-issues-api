@@ -1,6 +1,6 @@
 //. cms.js
 $( async function(){
-  var result0 = await getIssues();
+  var result0 = await getIssues( params );
   if( result0 && result0.status && result0.issues ){
     if( result0.issues.message ){
       $('#cms_head').html( '' );
@@ -16,6 +16,7 @@ $( async function(){
       var heads = '';
       var mains = '';
       var foots = '';
+      var pathname = location.pathname;
       //. 並びは番号順でいい？
       for( var i = result0.issues.length - 1; i >= 0; i -- ){
         var num = result0.issues[i].number;
@@ -26,7 +27,7 @@ $( async function(){
         var labels = "";
         if( result0.issues[i].labels && result0.issues[i].labels.length > 0 ){
           for( var j = 0; j < result0.issues[i].labels.length; j ++ ){
-            var label = '&nbsp;<span style="background: ' + result0.issues[i].labels[j].color + '">' + result0.issues[i].labels[j].name + '</span>';
+            var label = '&nbsp;<span style="background: ' + result0.issues[i].labels[j].color + '"><a href="' + pathname + '?labels=' + result0.issues[i].labels[j].name + '">' + result0.issues[i].labels[j].name + '</span>';
             labels += label;
           }
         }
@@ -49,6 +50,7 @@ $( async function(){
           + '<div class="card-header">'
           + labels
           + '</div>'
+          + '<a href="#" class="card-link">' + milestone + '</a>'
           + '<div class="card-body">'
           + '<h5 class="card-title">' + title + '</h5>'
           + '<h6 class="card-subtitle mb-2 text-muted">' + assignee + '</h6>'
@@ -56,7 +58,6 @@ $( async function(){
           + '</div>'
           + '<ul id="ul_' + num + '" class="list-group list-group-flush">'
           + '</ul>'
-          + '<a href="#" class="card-link">' + milestone + '</a>'
           + '<a class="btn btn-primary" target="_blank" href="https://github.com/' + GITHUB_REPO + '/issues/' + num + '">コメント</a>'
           + '</div>'
           + '</div>';
@@ -89,11 +90,15 @@ $( async function(){
   }
 });
 
-async function getIssues(){
+async function getIssues( params ){
   return new Promise( async function( resolve, reject ){
+    var p = '';
+    if( params ){
+      p = '&' + params;
+    }
     $.ajax({
       type: 'GET',
-      url: API_SERVER + '/api/github/issues/' + GITHUB_REPO + '?token=' + TOKEN,
+      url: API_SERVER + '/api/github/issues/' + GITHUB_REPO + '?token=' + TOKEN + p,
       success: function( result ){
         //console.log( result );
         showRateLimitReset( result );

@@ -141,13 +141,11 @@ app.get( '/cms', function( req, res ){
     };
   }
 
-  /*
-  var params = {};
+  var params = [];
   Object.keys( req.query ).forEach( function( key ){
-    params[key] = req.query[key];
+    params.push( key + '=' + req.query[key] );
   });
-  */
-  res.render( 'cms', { API_SERVER: API_SERVER, GITHUB_REPO: GITHUB_REPO, user: user, params: req.query } );
+  res.render( 'cms', { API_SERVER: API_SERVER, GITHUB_REPO: GITHUB_REPO, user: user, params: params.join( '&' ) } );
 });
 
 //. listening port
