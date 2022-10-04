@@ -53,7 +53,7 @@ api.getIssues = async function( user, repo, params_obj, token ){
         if( typeof body == 'string' ){
           body = JSON.parse( body );
         }
-        //console.log( { body } );
+        //console.log( { body } );  //. レートリミットに達していると { "message": "API rate limit  exceeded for 27.84.196.37. (But here's the good news: Authenticated requests get a higher rate limit. Check out the documentation for more details.)","documentation_url":"https://docs.github.com/rest/overview/resources-in-the-rest-api#rate-limiting" }
         resolve( { status: true, params: params_obj, res_headers: res.headers, issues: body } );
       }
     });

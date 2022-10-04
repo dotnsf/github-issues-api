@@ -27,14 +27,25 @@ $( async function(){
         var labels = "";
         if( result0.issues[i].labels && result0.issues[i].labels.length > 0 ){
           for( var j = 0; j < result0.issues[i].labels.length; j ++ ){
-            var label = '&nbsp;<span style="background: ' + result0.issues[i].labels[j].color + '"><a href="' + pathname + '?labels=' + result0.issues[i].labels[j].name + '">' + result0.issues[i].labels[j].name + '</span>';
+            var color = "white";
+            var background_color = result0.issues[i].labels[j].color;
+
+            var dd = 0;
+            for( var k = 0; k < 6; k += 2 ){
+              var c = background_color.substr( k, 2 );
+              var d = eval( '0x' + c );
+              dd += d;
+            }
+            if( dd > 128 * 3 ){ color = "black"; }
+
+            var label = '&nbsp;<a class="badge badge-pill" style="color: ' + color + '; background-color: #' + background_color + ';" href="' + pathname + '?labels=' + result0.issues[i].labels[j].name + '">' + result0.issues[i].labels[j].name + '</a>';
             labels += label;
           }
         }
 
         var assignee = "";
         if( result0.issues[i].assignee ){
-          assignee = '<img src="' + result0.issues[i].assignee.avatar_url + '" width="50"/>'
+          assignee = '<img src="' + result0.issues[i].assignee.avatar_url + '" width="24"/>'
             + '<a target="_blank" href="' + result0.issues[i].assignee.html_url + '">' + result0.issues[i].assignee.login + '</a>';
         }
 
@@ -48,17 +59,16 @@ $( async function(){
           + '<a name="main_' + num + '"/>'
           + '<div id="card_' + num + '" class="card">'
           + '<div class="card-header">'
-          + labels
+          + title + labels
           + '</div>'
-          + '<a href="#" class="card-link">' + milestone + '</a>'
           + '<div class="card-body">'
-          + '<h5 class="card-title">' + title + '</h5>'
-          + '<h6 class="card-subtitle mb-2 text-muted">' + assignee + '</h6>'
-          + '<p class="card-text"><pre>' + body + '</pre></p>'
+          + '<h6 class="card-subtitle' + ( assignee ? '' : ' mb-2 text-muted' ) + '">担当者: ' + ( assignee ? assignee : "（未アサイン）" ) + '</h6>'
+          + '<h6 class="card-subtitle' + ( milestone ? '' : ' mb-2 text-muted' ) + '">対応目途: ' + ( milestone ? milestone : "（未定）" ) + '</h6>'
+          + ( body ? '<p class="card-text"><pre>' + body + '</pre></p>' : '' )
           + '</div>'
           + '<ul id="ul_' + num + '" class="list-group list-group-flush">'
           + '</ul>'
-          + '<a class="btn btn-primary" target="_blank" href="https://github.com/' + GITHUB_REPO + '/issues/' + num + '">コメント</a>'
+          + '<a class="btn btn-primary" target="_blank" href="https://github.com/' + GITHUB_REPO + '/issues/' + num + '">GitHub Issue</a>'
           + '</div>'
           + '</div>';
       
