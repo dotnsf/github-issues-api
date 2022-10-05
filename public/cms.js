@@ -96,6 +96,8 @@ $( async function(){
       $('#my_toast-body').html( result0.error.message );
       $('#my_toast').toast( { delay: 2000 } );
       $('#my_toast').toast( 'show' );
+
+      $('#debug').html( result0.error.message );
     }
   }
 });
