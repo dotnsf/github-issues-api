@@ -1,17 +1,12 @@
 //. cms.js
 $( async function(){
   var result0 = await getIssues( params );
+  //console.log( { result0 } );
   if( result0 && result0.status && result0.issues ){
-    if( result0.issues.message ){
-      $('#cms_head').html( '' );
-      $('#cms_main').html( '' );
+    $('#cms_head').html( '' );
+    $('#cms_main').html( '' );
 
-      if( result0.issues.message ){
-        $('#my_toast-body').html( result0.issues.message );
-        $('#my_toast').toast( { delay: 1000 } );
-        $('#my_toast').toast( 'show' );
-      }
-    }else if( result0.issues.length > 0 ){
+    if( result0.issues.length > 0 ){
       var numbers = [];
       var heads = '';
       var mains = '';
@@ -68,7 +63,7 @@ $( async function(){
           + '</div>'
           + '<ul id="ul_' + num + '" class="list-group list-group-flush">'
           + '</ul>'
-          + '<a class="btn btn-primary" target="_blank" href="https://github.com/' + GITHUB_REPO + '/issues/' + num + '">GitHub Issue</a>'
+          + '<a class="btn btn-secondary" target="_blank" href="https://github.com/' + GITHUB_REPO + '/issues/' + num + '"><i class="fab fa-github"></i></a>'
           + '</div>'
           + '</div>';
       
@@ -97,6 +92,11 @@ $( async function(){
       }
     }
   }else{
+    if( result0 && result0.error && result0.error.message ){
+      $('#my_toast-body').html( result0.error.message );
+      $('#my_toast').toast( { delay: 2000 } );
+      $('#my_toast').toast( 'show' );
+    }
   }
 });
 

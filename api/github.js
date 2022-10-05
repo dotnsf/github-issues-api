@@ -53,8 +53,12 @@ api.getIssues = async function( user, repo, params_obj, token ){
         if( typeof body == 'string' ){
           body = JSON.parse( body );
         }
-        //console.log( { body } );  //. レートリミットに達していると { "message": "API rate limit  exceeded for 27.84.196.37. (But here's the good news: Authenticated requests get a higher rate limit. Check out the documentation for more details.)","documentation_url":"https://docs.github.com/rest/overview/resources-in-the-rest-api#rate-limiting" }
-        resolve( { status: true, params: params_obj, res_headers: res.headers, issues: body } );
+        //console.log( { body } );  //. レートリミットに達していると { "message": "API rate limit  exceeded for xx.xx.xx.xx. (But here's the good news: Authenticated requests get a higher rate limit. Check out the documentation for more details.)","documentation_url":"https://docs.github.com/rest/overview/resources-in-the-rest-api#rate-limiting" }
+        if( body.message ){
+          resolve( { status: false, params: params_obj, error: body } );
+        }else{
+          resolve( { status: true, params: params_obj, res_headers: res.headers, issues: body } );
+        }
       }
     });
   });
@@ -245,15 +249,25 @@ api.get( '/issues/:user/:repo', async function( req, res ){
         issues = issues.concat( result.issues );
       }
 
-      if( !result.issues || result.issues.length < PER_PAGE ){
+      if( !result.status || !result.issues || result.issues.length < PER_PAGE ){
         b = false;
       }else{
         page ++;
       }
     }
+    //console.log( result );
 
-    res.write( JSON.stringify( { status: true, headers: result.res_headers, issues: issues, api_call: page }, null, 2 ) );
-    res.end();
+    if( result.status ){
+      res.write( JSON.stringify( { status: true, headers: result.res_headers, issues: issues, api_call: page }, null, 2 ) );
+      res.end();
+    }else if( result.error ){
+      res.write( JSON.stringify( { status: false, error: result.error }, null, 2 ) );
+      res.end();
+    }else{
+      res.status( 400 );
+      res.write( JSON.stringify( { status: false, error: result }, null, 2 ) );
+      res.end();
+    }
   }else{
     res.status( 400 );
     res.write( JSON.stringify( { status: false, error: 'parameter user & repo are mandatory.' }, null, 2 ) );
