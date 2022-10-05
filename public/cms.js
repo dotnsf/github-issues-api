@@ -18,6 +18,8 @@ $( async function(){
         var comments = result0.issues[i].comments;
         var title = result0.issues[i].title;
         var body = ( result0.issues[i].body ? marked.parse( result0.issues[i].body ) : '' );
+        var created = getDateTime( result0.issues[i].created_at );
+        var updated = getDateTime( result0.issues[i].updated_at );
 
         var labels = "";
         if( result0.issues[i].labels && result0.issues[i].labels.length > 0 ){
@@ -60,6 +62,10 @@ $( async function(){
           + '<h6 class="card-subtitle' + ( assignee ? '' : ' mb-2 text-muted' ) + '">担当者: ' + ( assignee ? assignee : "（未アサイン）" ) + '</h6>'
           + '<h6 class="card-subtitle' + ( milestone ? '' : ' mb-2 text-muted' ) + '">対応目途: ' + ( milestone ? milestone : "（未定）" ) + '</h6>'
           + ( body ? '<p class="card-text"><pre>' + body + '</pre></p>' : '' )
+          + '<div style="text-align: right; font-size: 10pt;">'
+          + '作成日: ' + created
+          + ( created != updated ? '<br/>更新日: ' + updated : '' )
+          + '</div>'
           + '</div>'
           + '<ul id="ul_' + num + '" class="list-group list-group-flush">'
           + '</ul>'
@@ -83,9 +89,16 @@ $( async function(){
         var result1 = await getComments( num );
         if( result1 && result1.status && result1.comments && result1.comments.length > 0 ){
           for( var j = 0; j < result1.comments.length; j ++ ){
+            var created = getDateTime( result1.comments[j].created_at );
+            var updated = getDateTime( result1.comments[j].updated_at );
             var li1 = '<li class="list-group-item" id="li1_' + num + '_' + j + '"><pre>' 
               + ( result1.comments[j].body ? marked.parse( result1.comments[j].body ) : '' )
-              + '</pre></li>';
+              + '</pre>'
+              + '<div style="text-align: right; font-size: 10pt;">'
+              + '作成日: ' + created
+              + ( created != updated ? '<br/>更新日: ' + updated : '' )
+              + '</div>'
+              + '</li>';
             $('#ul_' + num).append( li1 );
           }
         }
@@ -154,21 +167,7 @@ function showRateLimitReset( result ){
     var reset = result.headers['x-ratelimit-reset'];
     if( typeof reset == 'string' ){ reset = parseInt( reset ); }
     reset *= 1000;
-    var t = new Date( reset );
-
-    var y = t.getFullYear();
-    var m = t.getMonth() + 1;
-    var d = t.getDate();
-    var h = t.getHours();
-    var n = t.getMinutes();
-    var s = t.getSeconds();
-
-    var ymdhns = y
-      + '-' + ( m < 10 ? '0' : '' ) + m
-      + '-' + ( d < 10 ? '0' : '' ) + d
-      + ' ' + ( h < 10 ? '0' : '' ) + h
-      + ':' + ( n < 10 ? '0' : '' ) + n
-      + ':' + ( s < 10 ? '0' : '' ) + s;
+    var ymdhns = getDateTime( reset ); 
 
     $('#ratelimit-remaining').html( remaining );
     $('#ratelimit-reset').html( ymdhns );
@@ -176,6 +175,26 @@ function showRateLimitReset( result ){
     $('#ratelimit-remaining').html( '--' );
     $('#ratelimit-reset').html( '--' );
   }
+}
+
+function getDateTime( seed ){
+  var t = ( seed ? new Date( seed ) : new Date() );
+
+  var y = t.getFullYear();
+  var m = t.getMonth() + 1;
+  var d = t.getDate();
+  var h = t.getHours();
+  var n = t.getMinutes();
+  var s = t.getSeconds();
+
+  var ymdhns = y
+    + '-' + ( m < 10 ? '0' : '' ) + m
+    + '-' + ( d < 10 ? '0' : '' ) + d
+    + ' ' + ( h < 10 ? '0' : '' ) + h
+    + ':' + ( n < 10 ? '0' : '' ) + n
+    + ':' + ( s < 10 ? '0' : '' ) + s;
+
+  return ymdhns;
 }
 
 function myLogin(){
